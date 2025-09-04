@@ -1,0 +1,54 @@
+<Window x:Class="TaskManager.Views.StartProcessWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:TaskManager.Views"
+        mc:Ignorable="d"
+        Title="StartProcessWindow" Height="150" Width="300"
+        WindowStyle="None"      
+        ResizeMode="NoResize">
+    
+       <Border BorderBrush="#FFAAAAAA" BorderThickness="1" CornerRadius="6" Padding="12" Background="White">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>   
+                <RowDefinition Height="*" />     
+            </Grid.RowDefinitions>
+            
+            <Grid Grid.Row="0" Margin="0,0,0,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>   
+                    <ColumnDefinition Width="5*"/>  
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="ProcessNameTextBox"
+                         Grid.Column="1"
+                         Height="30"
+                         VerticalContentAlignment="Center"
+                         FontSize="14"
+                         Text="{Binding ProcessName, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Column="0" FontSize="14"
+                           VerticalAlignment="Center"
+                           Text="Type name:"
+                           Foreground="#FF333333"/>
+            </Grid>
+            
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+
+                <Button Content="Cancel"
+                        Width="90" Height="30"
+                        Margin="0,0,8,0"
+                        IsCancel="True"
+                        FontSize="14"/>
+                
+                <Button Content="Accept"
+                        Width="90" Height="30"
+                        IsDefault="True"
+                        Command="{Binding AcceptCommand}" 
+                        FontSize="14"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

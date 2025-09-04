@@ -1,0 +1,51 @@
+﻿<Window x:Class="TaskManager.TaskManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TaskManager"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="410" Width="600">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="8*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Type name or PID to search" FontSize="14" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Height="25"
+                     FontSize="14" />
+        </Grid>
+
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Processes}" AutoGenerateColumns="False"
+                  SelectionMode="Single" SelectedItem="{Binding SelectedProcess}" IsReadOnly="True">
+
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Kill process" Command="{Binding KillProcessCommand}" />
+                    <MenuItem Header="To blacklist" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="PID" Width=".2*" Binding="{Binding Id}" />
+                <DataGridTextColumn Header="Name" Width=".5*" Binding="{Binding Name}" />
+                <DataGridTextColumn Header="Priority" Width=".2*" Binding="{Binding Priority}" />
+                <DataGridTextColumn Header="Cpu %" Width=".5*" Binding="{Binding CpuPercent, StringFormat={}{0:F2}}" />
+                <DataGridTextColumn Header="Memory Mb" Width=".7*" Binding="{Binding MemoryMb, StringFormat={}{0:F2}}" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5">
+            <Label Content="Total processes:" VerticalAlignment="Center" FontSize="14" />
+            <Label Content="{Binding Processes.Count}" VerticalAlignment="Center" FontSize="14" />
+            <Button Content="Start process" Height="25" Width="100" Margin="10, 0, 0, 0" FontSize="14" 
+                    Command="{Binding StartProcessCommand}"/>
+        </StackPanel>
+    </Grid>
+</Window>

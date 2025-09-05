@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TaskManager"
         mc:Ignorable="d"
-        Title="MainWindow" Height="410" Width="600">
+        Title="MainWindow" Height="410" Width="700">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -23,29 +23,59 @@
                      FontSize="14" />
         </Grid>
 
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Processes}" AutoGenerateColumns="False"
-                  SelectionMode="Single" SelectedItem="{Binding SelectedProcess}" IsReadOnly="True">
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
 
-            <DataGrid.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Kill process" Command="{Binding KillProcessCommand}" />
-                    <MenuItem Header="To blacklist" />
-                </ContextMenu>
-            </DataGrid.ContextMenu>
+            <GroupBox Grid.Column="0" Header="All Processes">
 
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="PID" Width=".2*" Binding="{Binding Id}" />
-                <DataGridTextColumn Header="Name" Width=".5*" Binding="{Binding Name}" />
-                <DataGridTextColumn Header="Priority" Width=".2*" Binding="{Binding Priority}" />
-                <DataGridTextColumn Header="Cpu %" Width=".5*" Binding="{Binding CpuPercent, StringFormat={}{0:F2}}" />
-                <DataGridTextColumn Header="Memory Mb" Width=".7*" Binding="{Binding MemoryMb, StringFormat={}{0:F2}}" />
-            </DataGrid.Columns>
-        </DataGrid>
+                <DataGrid ItemsSource="{Binding Processes}" AutoGenerateColumns="False"
+                          SelectionMode="Single" SelectedItem="{Binding SelectedProcess}" IsReadOnly="True">
+
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Kill process" Command="{Binding KillProcessCommand}" />
+                            <MenuItem Header="To blacklist" Command="{Binding ToBlacklistCommand}"/>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="PID" Width=".3*" Binding="{Binding Id}" />
+                        <DataGridTextColumn Header="Name" Width=".6*" Binding="{Binding Name}" />
+                        <DataGridTextColumn Header="Priority" Width=".3*" Binding="{Binding Priority}" />
+                        <DataGridTextColumn Header="Cpu %" Width=".5*"
+                                            Binding="{Binding CpuPercent, StringFormat={}{0:F2}}" />
+                        <DataGridTextColumn Header="Memory Mb" Width=".5*"
+                                            Binding="{Binding MemoryMb, StringFormat={}{0:F2}}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+                
+            </GroupBox>
+            <GroupBox Grid.Column="1" Header="Blacklist">
+                <DataGrid ItemsSource="{Binding BlacklistProcesses}" AutoGenerateColumns="False"
+                          SelectionMode="Single" SelectedItem="{Binding SelectedBlacklistProcess}" IsReadOnly="True">
+                    
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Remove from blacklist" Command="{Binding RemoveFromBlacklistCommand}"/>
+                        </ContextMenu>    
+                    </DataGrid.ContextMenu>
+                    
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="PID"  Width="*" Binding="{Binding Id}"/>
+                        <DataGridTextColumn Header="Name" Width="3*" Binding="{Binding Name}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+
+        </Grid>
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5">
             <Label Content="Total processes:" VerticalAlignment="Center" FontSize="14" />
             <Label Content="{Binding Processes.Count}" VerticalAlignment="Center" FontSize="14" />
-            <Button Content="Start process" Height="25" Width="100" Margin="10, 0, 0, 0" FontSize="14" 
-                    Command="{Binding StartProcessCommand}"/>
+            <Button Content="Start process" Height="25" Width="100" Margin="10, 0, 0, 0" FontSize="14"
+                    Command="{Binding StartProcessCommand}" />
         </StackPanel>
     </Grid>
 </Window>

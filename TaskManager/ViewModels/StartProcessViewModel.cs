@@ -25,7 +25,6 @@ public class StartProcessViewModel
     }
 
     public RelayCommand AcceptCommand { get; }
-    public RelayCommand CancelCommand { get; }
 
     public StartProcessViewModel()
     {

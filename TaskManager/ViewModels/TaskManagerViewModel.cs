@@ -24,6 +24,10 @@ public class TaskManagerViewModel
     public ObservableCollection<ProcessInfo> Processes { get; init; } = new();
     public ProcessInfo? SelectedProcess { get; set; }
 
+    public ObservableCollection<ProcessInfo> BlacklistProcesses { get; set; } = new();
+
+    public ProcessInfo SelectedBlacklistProcess { get; set; }
+
     public string SearchText
     {
         get => _searchText;
@@ -37,8 +41,11 @@ public class TaskManagerViewModel
     private DispatcherTimer _timer;
     public ICommand KillProcessCommand { get; }
     public ICommand StartProcessCommand { get; }
+    public ICommand ToBlacklistCommand { get; }
+    public ICommand RemoveFromBlacklistCommand { get; }
 
-    public TaskManagerViewModel(ProcessesMonitoringService processesMonitoringService, StartProcessViewModel startProcessViewModel)
+    public TaskManagerViewModel(ProcessesMonitoringService processesMonitoringService,
+        StartProcessViewModel startProcessViewModel)
     {
         _processesMonitoringService = processesMonitoringService;
 
@@ -54,14 +61,26 @@ public class TaskManagerViewModel
 
         _timer.Start();
 
-        KillProcessCommand = new RelayCommand(Kill, () => SelectedProcess != null);
         StartProcessCommand = new RelayCommand(StartProcess, () => true);
+        ToBlacklistCommand = new RelayCommand(AddToBlacklist, () => SelectedProcess != null);
+        RemoveFromBlacklistCommand = new RelayCommand(RemoveFromBlacklist, () => SelectedBlacklistProcess != null);
+        KillProcessCommand = new RelayCommand(() =>
+        {
+            try
+            {
+                Kill();
+            }
+            catch (InvalidOperationException e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }, () => SelectedProcess != null);
     }
 
     private void LoadProcesses()
     {
         Processes.Clear();
-        
+
         foreach (var process in _allProcesses)
         {
             Processes?.Add(process);
@@ -81,7 +100,7 @@ public class TaskManagerViewModel
     private void Timer_Tick(object sender, EventArgs e)
     {
         // Refresh();
-        
+
         foreach (var process in Processes)
         {
             _processesMonitoringService.UpdateMemory(process);
@@ -94,7 +113,7 @@ public class TaskManagerViewModel
         _allProcesses.Clear();
 
         var processes = Process.GetProcesses();
-        
+
         foreach (var process in processes)
         {
             _allProcesses.Add(new(process));
@@ -107,15 +126,14 @@ public class TaskManagerViewModel
     {
         try
         {
-            SelectedProcess.WrappedProcess.Kill();
+            SelectedProcess!.WrappedProcess.Kill();
 
             _allProcesses.Remove(SelectedProcess);
             Processes.Remove(SelectedProcess);
         }
         catch
         {
-            MessageBox.Show($"{SelectedProcess.Name}: Access denied", "Error", MessageBoxButton.OK,
-                MessageBoxImage.Error);
+            throw new InvalidOperationException($"{SelectedProcess!.Name}: Access denied");
         }
     }
 
@@ -148,5 +166,27 @@ public class TaskManagerViewModel
                                                           || pi.Id.ToString().Contains(SearchText));
 
         LoadProcesses(filteredProcesses);
+    }
+
+    private void AddToBlacklist()
+    {
+        try
+        {
+            Kill();
+        }
+        catch(Exception e)
+        {
+            MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+        
+        var temp = SelectedProcess!;
+        Processes.Remove(SelectedProcess!);
+        BlacklistProcesses.Add(temp);
+    }
+
+    private void RemoveFromBlacklist()
+    {
+        BlacklistProcesses.Remove(SelectedProcess!);
     }
 }

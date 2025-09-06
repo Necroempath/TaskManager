@@ -145,13 +145,22 @@ public class TaskManagerViewModel
 
         window.ShowDialog();
 
-        if (_startProcessViewModel.AddedProcess != null)
-        {
-            ProcessInfo process = new(_startProcessViewModel.AddedProcess);
 
-            _allProcesses.Add(process);
-            Processes.Add(process);
+        ProcessInfo process = new(_startProcessViewModel.AddedProcess);
+        
+        if (BlacklistProcesses.Any(p => p.Name == process.Name))
+        {
+            new Thread(() =>
+            {
+                Thread.Sleep(2000);
+                process.WrappedProcess.Kill();
+            }).Start();
+            
+            return;
         }
+        
+        _allProcesses.Add(process);
+        Processes.Add(process);
     }
 
     private void Search()
@@ -170,23 +179,21 @@ public class TaskManagerViewModel
 
     private void AddToBlacklist()
     {
+        var selected = new ProcessInfo(SelectedProcess!.WrappedProcess);
+
         try
         {
             Kill();
+            BlacklistProcesses.Add(selected);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            return;
         }
-        
-        var temp = SelectedProcess!;
-        Processes.Remove(SelectedProcess!);
-        BlacklistProcesses.Add(temp);
     }
 
     private void RemoveFromBlacklist()
     {
-        BlacklistProcesses.Remove(SelectedProcess!);
+        BlacklistProcesses.Remove(SelectedBlacklistProcess);
     }
 }
